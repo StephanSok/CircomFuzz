@@ -1,0 +1,5 @@
+#!/bin/bash
+llvm-profdata merge -sparse foo.profraw -o foo.profdata
+# llvm-cov show ./sha -instr-profile=foo.profdata
+llvm-cov report ./sha -instr-profile=foo.profdata
+rm foo.prof*
