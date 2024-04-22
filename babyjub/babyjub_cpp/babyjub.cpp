@@ -47,6 +47,45 @@ delete[] ctx->componentMemory[pos].subcomponents;
 
 
 // function declarations
+
+// generate extra counters start
+#include <cstring>
+#include <gmpxx.h>
+static const size_t ELEMENTS_COUNT = 14;
+static const size_t CHECKS_COUNT = 3;
+
+#ifdef __linux__
+__attribute__((section("__libfuzzer_extra_counters")))
+#endif
+static uint8_t extra_counters[ELEMENTS_COUNT + ELEMENTS_COUNT * 253 + 1];
+
+static uint8_t is_not_bool_elements[ELEMENTS_COUNT];
+static size_t proccess_count = 0;
+
+void proccess_bool_element(PFrElement signal_element, size_t index){
+    char* str_element = Fr_element2str(signal_element);
+    if (strlen(str_element) != 1 || (str_element[0] != '0' && str_element[0] != '1')){
+        is_not_bool_elements[index] = 1;
+    }
+    if (index == ELEMENTS_COUNT - 1) ++proccess_count;
+    if (proccess_count < CHECKS_COUNT || is_not_bool_elements[index]){
+        free(str_element);
+        return;
+    }
+    extra_counters[index] = (str_element[0] == '1');
+    free(str_element);
+}
+
+void proccess_overflow_element(PFrElement signal_element, size_t index){
+    char* str_element = Fr_element2str(signal_element);
+    mpz_class element;
+    element = str_element;
+    int highest_bit = mpz_sizeinbase(element.get_mpz_t(), 2) - 1;
+    extra_counters[ELEMENTS_COUNT + index*253 + highest_bit] = 1;
+    free(str_element);
+}
+// generate extra counters end
+
 // template declarations
 void BabyAdd_0_create(uint soffset,uint coffset,Circom_CalcWit* ctx,std::string componentName,uint componentFather){
 ctx->componentMemory[coffset].templateId = 0;
@@ -77,12 +116,30 @@ PFrElement aux_dest = &lvar[0];
 // load src
 // end load src
 Fr_copy(aux_dest,&circuitConstants[0]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 0);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 0);
+// generate extra counters end
+
 }
 {
 PFrElement aux_dest = &lvar[1];
 // load src
 // end load src
 Fr_copy(aux_dest,&circuitConstants[1]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 1);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 1);
+// generate extra counters end
+
 }
 {
 PFrElement aux_dest = &signalValues[mySignalStart + 6];
@@ -90,6 +147,15 @@ PFrElement aux_dest = &signalValues[mySignalStart + 6];
 Fr_mul(&expaux[0],&signalValues[mySignalStart + 2],&signalValues[mySignalStart + 5]); // line circom 40
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 2);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 2);
+// generate extra counters end
+
 }
 {
 PFrElement aux_dest = &signalValues[mySignalStart + 7];
@@ -97,6 +163,15 @@ PFrElement aux_dest = &signalValues[mySignalStart + 7];
 Fr_mul(&expaux[0],&signalValues[mySignalStart + 3],&signalValues[mySignalStart + 4]); // line circom 41
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 3);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 3);
+// generate extra counters end
+
 }
 {
 PFrElement aux_dest = &signalValues[mySignalStart + 8];
@@ -107,6 +182,15 @@ Fr_add(&expaux[2],&signalValues[mySignalStart + 4],&signalValues[mySignalStart +
 Fr_mul(&expaux[0],&expaux[1],&expaux[2]); // line circom 42
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 4);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 4);
+// generate extra counters end
+
 }
 {
 PFrElement aux_dest = &signalValues[mySignalStart + 9];
@@ -114,6 +198,15 @@ PFrElement aux_dest = &signalValues[mySignalStart + 9];
 Fr_mul(&expaux[0],&signalValues[mySignalStart + 6],&signalValues[mySignalStart + 7]); // line circom 43
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 5);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 5);
+// generate extra counters end
+
 }
 {
 PFrElement aux_dest = &signalValues[mySignalStart + 0];
@@ -124,6 +217,15 @@ Fr_add(&expaux[2],&circuitConstants[3],&expaux[4]); // line circom 45
 Fr_div(&expaux[0],&expaux[1],&expaux[2]); // line circom 45
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 6);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 6);
+// generate extra counters end
+
 }
 Fr_mul(&expaux[4],&circuitConstants[1],&signalValues[mySignalStart + 9]); // line circom 46
 Fr_add(&expaux[2],&circuitConstants[3],&expaux[4]); // line circom 46
@@ -143,6 +245,15 @@ Fr_sub(&expaux[2],&circuitConstants[3],&expaux[4]); // line circom 48
 Fr_div(&expaux[0],&expaux[1],&expaux[2]); // line circom 48
 // end load src
 Fr_copy(aux_dest,&expaux[0]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 7);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 7);
+// generate extra counters end
+
 }
 Fr_mul(&expaux[4],&circuitConstants[1],&signalValues[mySignalStart + 9]); // line circom 49
 Fr_sub(&expaux[2],&circuitConstants[3],&expaux[4]); // line circom 49
@@ -202,6 +313,15 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 // load src
 // end load src
 Fr_copy(aux_dest,&signalValues[mySignalStart + 2]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 8);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 8);
+// generate extra counters end
+
 }
 // no need to run sub component
 assert(--ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter);
@@ -213,6 +333,15 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 // load src
 // end load src
 Fr_copy(aux_dest,&signalValues[mySignalStart + 3]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 9);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 9);
+// generate extra counters end
+
 }
 // no need to run sub component
 assert(--ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter);
@@ -224,6 +353,15 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 // load src
 // end load src
 Fr_copy(aux_dest,&signalValues[mySignalStart + 4]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 10);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 10);
+// generate extra counters end
+
 }
 // no need to run sub component
 assert(--ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter);
@@ -235,6 +373,15 @@ PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cm
 // load src
 // end load src
 Fr_copy(aux_dest,&signalValues[mySignalStart + 5]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 11);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 11);
+// generate extra counters end
+
 }
 // need to run sub component
 assert(!(--ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter));
@@ -245,12 +392,30 @@ PFrElement aux_dest = &signalValues[mySignalStart + 0];
 // load src
 // end load src
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + 0]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 12);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 12);
+// generate extra counters end
+
 }
 {
 PFrElement aux_dest = &signalValues[mySignalStart + 1];
 // load src
 // end load src
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + 1]);
+
+// generate extra counters start
+proccess_overflow_element(aux_dest, 13);
+// generate extra counters end
+
+// generate extra counters start
+proccess_bool_element(aux_dest, 13);
+// generate extra counters end
+
 }
 for (uint i = 0; i < 1; i++){
 uint index_subc = ctx->componentMemory[ctx_index].subcomponents[i];
